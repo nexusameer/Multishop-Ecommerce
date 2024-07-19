@@ -46,19 +46,43 @@ class CartViewSet(viewsets.ViewSet):
         quantity = request.data.get('quantity')
         cart_item = CartItem.objects.get(id=item_id)
         cart_item.quantity = int(quantity)
-        cart_item.save()
         
         serializer = CartSerializer(cart)
         return Response(serializer.data)
 
-    @action(detail=False, methods=['post'])
-    def remove_cart_item(self, request):
-        cart = Cart.objects.get(user=request.user)
-        item_id = request.data.get('item_id')
-        cart_item = CartItem.objects.get(id=item_id)
+    def _remove_cart_item(self, cart_item):
         cart_item.delete()
-        
+        cart = cart_item.cart
         serializer = CartSerializer(cart)
         return Response(serializer.data)
     
+    @action(detail=False, methods = ['post'])
+    def remove_cart_item(self, request):
+        cart_item_id = request.data.get('cart_item_id')
+        cart_item = CartItem.objects.get(id=cart_item_id)
+        return self._remove_cart_item(cart_item)
+    
+    @action(detail=False, methods = ['post'])
+    def increment_quantity(self, request):
+        cart_item_id = request.data.get('cart_item_id')
+        cart_item = CartItem.objects.get(id = cart_item_id)
+        cart_item.quantity +=1
+        cart_item.save()
+
+        serializer = CartSerializer(cart_item.cart)
+        return Response(serializer.data)
+
+    @action(detail=False, methods = ['post'])
+    def decrement_quantity(self, request):
+        cart_item_id = request.data.get('cart_item_id')
+        cart_item = CartItem.objects.get(id= cart_item_id)
+        cart_item.quantity -=1
+        cart_item.save()
+
+        if cart_item.quantity == 0:
+            self._remove_cart_item(cart_item)
+        
+
+        serializer = CartSerializer(cart_item.cart)
+        return Response(serializer.data)
     
