@@ -23,3 +23,17 @@ class HomeView(TemplateView):
             context['products'] = Product.objects.all()
 
         return context
+    
+
+class ShopView(TemplateView):
+    template_name = 'shop.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        
+        context['products'] = Product.objects.all()
+        return context
+
+
+class ContactView(TemplateView):
+    template_name = 'contact.html'

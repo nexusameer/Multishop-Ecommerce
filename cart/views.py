@@ -1,3 +1,4 @@
+from typing import Any
 from django.shortcuts import render
 from django.views.generic import TemplateView
 from cart.models import *
@@ -8,6 +9,14 @@ from rest_framework import serializers, viewsets
 
 
 # Create your views here.
+class CartView(TemplateView):
+    template_name = 'cart.html'
+
+    def get_context_data(self, **kwargs: Any):
+        context = super().get_context_data(**kwargs)
+        cart_items = CartItem.objects.all()
+        context['cart_items'] = cart_items
+        return context
 
 class CartViewSet(viewsets.ViewSet):
     def retrieve_cart(self, request):
