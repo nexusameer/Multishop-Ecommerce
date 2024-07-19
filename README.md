@@ -25,7 +25,7 @@ This is a fully-functional e-commerce website built with Django, featuring a dyn
 1. Clone the repository:
 https://github.com/nexusameer/Multishop-Ecommerce
 2. Navigate to the project directory:
-cd ecommerce-django
+cd Multishop
 3. Create a virtual environment:
 pip install virtualenv
 virtualenv myenv
