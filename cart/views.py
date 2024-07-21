@@ -35,9 +35,6 @@ class CartView(TemplateView):
                     quantity = cart_item.quantity
                 )
 
-            # Here you can create an Order object if needed
-            # Order.objects.create(...)
-
             # Clear the cart
             cart.cartitem_set.all().delete()
 

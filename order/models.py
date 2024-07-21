@@ -16,7 +16,7 @@ class Order(models.Model):
         ('bank_transfer', 'Bank Transfer'),
     ]
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
-    cart = models.ForeignKey(Cart, on_delete=models.CASCADE, null=True, blank=True)
+    checkout = models.ForeignKey(Checkout, on_delete=models.CASCADE, null=True, blank=True)
     order_number = models.CharField(max_length=20, unique=True, editable=False)
     name = models.CharField(max_length=300)
     email = models.EmailField(max_length=200, null=True, blank=True)
