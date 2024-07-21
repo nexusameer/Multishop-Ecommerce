@@ -49,21 +49,20 @@
             <h5 class="section-title position-relative text-uppercase mb-3">
                 <span class="bg-secondary pr-3">Cart Summary</span>
             </h5>
+            <form method="POST" enctype="multipart/form-data" action="{% url 'cart_view' %}"
+            onsubmit="document.getElementById('cart-total-input').value = document.getElementById('cart-total').innerText;">
+                {% csrf_token %}
             <div class="bg-light p-30 mb-5">
-                <div class="border-bottom pb-2">
-                    <div class="d-flex justify-content-between">
-                        <h6 class="font-weight-medium">Shipping</h6>
-                        <h6 class="font-weight-medium" id="shipping-cost">Rs: 0.00</h6>
-                    </div>
-                </div>
                 <div class="pt-2">
                     <div class="d-flex justify-content-between mt-2">
                         <h5>Total</h5>
                         <h5 id="cart-total">0.00</h5>
                     </div>
-                    <button class="btn btn-block btn-primary font-weight-bold my-3 py-3">Proceed To Checkout</button>
+                    <input type="hidden" name="total_amount" id="cart-total-input">
+                    <button class="btn btn-block btn-primary font-weight-bold my-3 py-3" type="submit">Proceed To Checkout</button>
                 </div>
             </div>
+            </form>
         </div>
     </div>
 </div>

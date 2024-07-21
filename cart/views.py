@@ -6,11 +6,46 @@ from cart.serializers import *
 from rest_framework. response import Response
 from rest_framework.decorators import action
 from rest_framework import serializers, viewsets
+from django.shortcuts import redirect
+from django.urls import reverse_lazy
+import pdb
 
 
 # Create your views here.
 class CartView(TemplateView):
     template_name = 'cart.html'
+
+    def post(self, request, *args, **kwargs):
+        # pdb.set_trace()
+        user = request.user
+        cart = Cart.objects.get(user=user)
+        cart_items = CartItem.objects.filter(cart=cart)
+        total_amount = request.POST.get('total_amount')
+
+        if cart_items.exists() and total_amount:
+            checkout = Checkout.objects.create(
+                user=user,
+                total_amount=total_amount
+            )
+
+            for cart_item in cart_items:
+                CheckoutItem.objects.create(
+                    checkout=checkout,
+                    product = cart_item.product,
+                    quantity = cart_item.quantity
+                )
+
+            # Here you can create an Order object if needed
+            # Order.objects.create(...)
+
+            # Clear the cart
+            cart.cartitem_set.all().delete()
+
+            # Redirect to order confirmation page
+            return redirect(reverse_lazy('home'))
+        else:
+            # Handle error - redirect back to cart page with an error message
+            return redirect(reverse_lazy('cart_view'))
 
     def get_context_data(self, **kwargs: Any):
         context = super().get_context_data(**kwargs)
