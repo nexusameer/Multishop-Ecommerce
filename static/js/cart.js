@@ -18,7 +18,7 @@
     }
 
     function formatPrice(price) {
-        return 'Rs: ' + price.toFixed(2);
+        return price;
     }
 
     function updateCartItemTotal($row) {

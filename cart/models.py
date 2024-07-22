@@ -22,8 +22,13 @@ class CartItem(models.Model):
     
 
 class Checkout(models.Model):
+    STATUS_CHOICES ={
+        'pending' : 'pending',
+        'ordered' : 'ordered'
+    }
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     total_amount = models.CharField(max_length=100, null=True, blank=True)
+    status = models.CharField(max_length=200, choices=STATUS_CHOICES, default='pending')
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
