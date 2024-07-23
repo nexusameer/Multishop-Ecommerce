@@ -1,28 +1,30 @@
 from django.views.generic import TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.shortcuts import redirect, reverse, render
+from django.shortcuts import redirect, reverse
 from django.db.models import Sum
-from cart.models import Checkout
+from cart.models import Checkout, CheckoutItem
 from .models import Order
 
-class OrderView(TemplateView):
+class OrderView(LoginRequiredMixin, TemplateView):
     template_name = 'order.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         user = self.request.user
-        context['pending_checkouts'] = Checkout.objects.filter(user=user, status='pending')
+        pending_checkouts = Checkout.objects.filter(user=user, status='pending')
+        context['pending_checkouts'] = pending_checkouts
+        context['pending_checkout_items'] = CheckoutItem.objects.filter(checkout__in=pending_checkouts)
         return context
 
     def post(self, request, *args, **kwargs):
-
         user = request.user
         checkout_ids = request.POST.getlist('checkout_ids')
         checkouts = Checkout.objects.filter(id__in=checkout_ids, user=user, status='pending')
+        checkout_items = CheckoutItem.objects.filter(checkout__in=checkouts)
 
         if not checkouts.exists():
             # Handle the case where there are no pending checkouts for the user
-            return render(request, 'error.html')
+            return redirect('errors.html')
 
         name = request.POST.get('name')
         email = request.POST.get('email')
@@ -30,7 +32,8 @@ class OrderView(TemplateView):
         address = request.POST.get('address')
         city = request.POST.get('city')
         zip_code = request.POST.get('zip_code')
-        total_amount = checkouts.aggregate(Sum('total_amount'))['total_amount__sum'] or 0
+        payment_method = request.POST.get('payment_method')
+        total_amount = checkout_items.aggregate(Sum('checkout__total_amount'))['checkout__total_amount__sum'] or 0
 
         # Create an Order object
         order = Order.objects.create(
@@ -42,14 +45,15 @@ class OrderView(TemplateView):
             city=city,
             zip_code=zip_code,
             status='draft',  # Set initial status to 'draft'
-            payment_method=request.POST.get('payment_method'),
+            payment_method=payment_method,
             total_amount=total_amount
         )
 
-        # Link the checkouts to the order
-        order.checkouts.set(checkouts)
+        # Link the CheckoutItems to the order
+        order.checkoutitems.add(*checkout_items)
         order.save()
 
+        # Update the status of each checkout to 'ordered'
         for i in checkouts:
             checkouts.update(status='ordered')
 

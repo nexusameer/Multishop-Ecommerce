@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
-from cart.models import Checkout
+from cart.models import *
 from datetime import datetime
 
 class Order(models.Model):
@@ -14,7 +14,7 @@ class Order(models.Model):
         ('bank_transfer', 'Bank Transfer'),
     ]
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
-    checkouts = models.ManyToManyField(Checkout, related_name='orders')
+    checkoutitems = models.ManyToManyField(CheckoutItem, related_name='orders')
     order_number = models.CharField(max_length=20, unique=True, editable=False)
     name = models.CharField(max_length=300)
     email = models.EmailField(max_length=200, null=True, blank=True)

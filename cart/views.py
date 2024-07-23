@@ -39,7 +39,7 @@ class CartView(TemplateView):
             cart.cartitem_set.all().delete()
 
             # Redirect to order confirmation page
-            return redirect(reverse_lazy('home'))
+            return redirect(reverse_lazy('order'))
         else:
             # Handle error - redirect back to cart page with an error message
             return redirect(reverse_lazy('cart_view'))
